@@ -28,7 +28,8 @@ struct{
  int V_100; //batt voltage 
 }datSens;
 
-  int lamp;
+  //int lamp;
+  uint8_t lamp[32];
   volatile int count = 0;
   // Timer 1 interrupt service routine (ISR)
 ISR(TIMER1_COMPA_vect)
@@ -57,7 +58,9 @@ void setup() {
 
   if (!htu.begin()) Serial.println(F("HTU21D error"));
   delay(100);
-  
+  char debugA[1000];
+  nRF.sprintfPrettyDetails(debugA);
+  Serial.print(debugA);
   cli(); // disable interrupts during setup
   // Configure Timer 1 interrupt
   // F_clock = 16e6 Hz, prescaler = 64, Fs = 1 Hz
@@ -89,10 +92,11 @@ void loop() {
     while (nRF.available()) {
       // v případě příjmu dat se provede zápis
       // do proměnné prijem
-      nRF.read( &lamp, sizeof(lamp) );
+    ////  nRF.read( &lamp, sizeof(lamp) );
+    nRF.read( lamp, sizeof(lamp) );
     }
     // vytisknutí přijatých dat na sériovou linku
-    switch( lamp ) {
+    switch( lamp[0] ) {
       case 0:
         Serial.println("LAMP OFF ");
         break;
